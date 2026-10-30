@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dynoz Deadlines</title>
+<meta name="description" content="Dynoz Deadlines: add assignment deadlines from your phone. Synced to Google Sheets and the Dynoz Desk wallpaper.">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Deadlines">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="brand"><span class="dot"></span>DYNOZ</div>
+    <div class="top-actions">
+      <span id="sync" class="sync" title="Sync status"></span>
+      <button id="btnRefresh" class="icon-btn" aria-label="Refresh">
+        <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5"/></svg>
+      </button>
+      <button id="btnSettings" class="icon-btn" aria-label="Settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <section class="hello">
+    <h1>Deadlines</h1>
+    <p id="today"></p>
+  </section>
+
+  <section id="hero" class="hero" hidden></section>
+
+  <div id="install" class="install" hidden>
+    <div><b>Put it on your home screen</b><span id="installHow"></span></div>
+    <button id="btnInstall" class="pill" hidden>Install</button>
+    <button id="btnInstallX" class="x" aria-label="Dismiss">✕</button>
+  </div>
+
+  <div id="setupCard" class="setup" hidden>
+    <b>Enter your PIN</b>
+    <p>One time only. After that, everything you add here shows up on your laptop wallpaper.</p>
+    <button class="pill red" id="btnSetup">Enter PIN</button>
+  </div>
+
+  <main id="list"></main>
+
+  <button id="fab" class="fab" aria-label="Add deadline">
+    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+</div>
+
+<!-- add / edit sheet -->
+<div id="scrim" class="scrim" hidden></div>
+<form id="sheet" class="sheet" hidden autocomplete="off">
+  <div class="grab"></div>
+  <h2 id="sheetTitle">New deadline</h2>
+
+  <label class="lbl">Course</label>
+  <div id="codes" class="chips"></div>
+  <input id="fCode" class="field" placeholder="Course code (optional)" maxlength="20" autocapitalize="characters">
+
+  <label class="lbl" for="fTask">Task</label>
+  <input id="fTask" class="field big" placeholder="e.g. Assignment 1: Poster design" maxlength="200" required>
+
+  <label class="lbl">Due</label>
+  <div id="quick" class="chips small"></div>
+  <div class="row2">
+    <input id="fDate" class="field" type="date" required>
+    <input id="fTime" class="field" type="time" value="23:59" required>
+  </div>
+
+  <div class="sheet-actions">
+    <button type="button" id="btnDelete" class="ghost danger" hidden>Delete</button>
+    <button type="button" id="btnDoneToggle" class="ghost" hidden>Mark done</button>
+    <span class="grow"></span>
+    <button type="button" id="btnCancel" class="ghost">Cancel</button>
+    <button type="submit" class="pill red">Save</button>
+  </div>
+</form>
+
+<!-- settings sheet -->
+<form id="settings" class="sheet" hidden autocomplete="off">
+  <div class="grab"></div>
+  <h2>Settings</h2>
+  <label class="lbl" for="sUrl">Apps Script web-app URL</label>
+  <input id="sUrl" class="field" placeholder="https://script.google.com/macros/s/…/exec" inputmode="url">
+  <label class="lbl" for="sPin">PIN</label>
+  <input id="sPin" class="field" type="password" placeholder="The PIN you set in Code.gs" inputmode="numeric">
+  <p id="sMsg" class="msg"></p>
+  <div class="sheet-actions">
+    <a class="ghost" id="lnkSheet" target="_blank" rel="noopener">Open Sheet ↗</a>
+    <span class="grow"></span>
+    <button type="button" id="sCancel" class="ghost">Close</button>
+    <button type="submit" class="pill red">Connect</button>
+  </div>
+</form>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>
